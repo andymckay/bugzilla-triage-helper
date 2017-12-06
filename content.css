@@ -1,0 +1,38 @@
+#bugzilla-triage-helper {
+    position: fixed;
+    top: 1em;
+    left: 1em;
+    width: 10em;
+    height: 15em;
+    border: 1px solid lightgrey;
+    padding: 1em;
+    z-index: 1000;
+    background: white;
+}
+
+#bugzilla-triage-helper img {
+    position: fixed;
+    top: 0.8em;
+    left: 0.8em;
+    z-index: 1001;
+    height: 16px;
+    width: 16px;
+    border: none;
+}
+
+#bugzilla-triage-helper a {
+    display: block;
+    color: white;
+    font-weight: bold;
+    padding: 0.3em;
+    margin-bottom: 0.2em;
+    text-transform: lowercase;
+}
+
+#bugzilla-triage-helper a.action-wontfix {
+    background: firebrick;
+}
+
+#bugzilla-triage-helper a.action-investigate {
+    background: darkolivegreen;
+}
