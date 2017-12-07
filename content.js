@@ -1,24 +1,64 @@
+let changeEvent = new UIEvent('change');
+let urlObj = new URL(window.location);
+let params = new URLSearchParams(urlObj.search);
+let bugNumber = params.get('id');
+
+
 function wontfix() {
-  console.log('[triage-helper] in wontfix');
-  insertCommentAndMoveTo("Won't fix this baby");
+  console.log(`[triage-helper:${bugNumber}] in wontfix`);
+  insertCommentAndMoveTo("Won't fixing this bug.");
+  changeStatus('RESOLVED', 'WONTFIX');
 }
 
-function investigate() {
-  console.log('[triage-helper] in investigate');
+function blocker() {
+  console.log(`[triage-helper:${bugNumber}] in blocker`);
+  changePriority('P1', 'blocker');
 }
 
 function insertCommentAndMoveTo(text) {
-  console.log('[triage-helper] grabbing comment');
-  document.getElementById('comment').value = text;
+  console.log(`[triage-helper:${bugNumber}] inserting comment`);
+  let comment = document.getElementById('comment');
+  comment.value = text;
+  comment.focus();
+}
+
+function changePriority(priority, severity) {
+  console.log(`[triage-helper:${bugNumber}] changing priority`);
+  let priorityElement = document.getElementById('priority');
+  priorityElement.value = priority;
+  priorityElement.dispatchEvent(changeEvent);
+
+  if (severity) {
+    let severityElement = document.getElementById('bug_severity');
+    severityElement.value = severity;
+  }
+}
+
+function changeStatus(status, resolution, duplicate) {
+  console.log(`[triage-helper:${bugNumber}] changing status`);
+  let statusElement = document.getElementById('bug_status');
+  let resolutionElement = document.getElementById('resolution');
+  let duplicateElement = document.getElementById('dup_id');
+
+  statusElement.value = status;
+  statusElement.dispatchEvent(changeEvent);
+
+  if (status === 'RESOLVED') {
+    resolutionElement.value = resolution;
+    resolutionElement.dispatchEvent(changeEvent);
+    if (resolutionElement === 'DUPLICATE') {
+      duplicateElement.value = duplicate;
+    }
+  }
 }
 
 function createOverlay() {
   let container = document.createElement('div');
   container.id = 'bugzilla-triage-helper';
-  container.style.display = 'none';
 
   let img = document.createElement('img');
   img.src = browser.runtime.getURL('question.svg');
+  img.title = 'Bugzilla Triage Helper';
   container.appendChild(img);
 
   let actions = [
@@ -27,20 +67,21 @@ function createOverlay() {
       id: "wontfix"
     },
     {
-      text: "Investigate",
-      id: "investigate"
+      text: "P1 Blocker",
+      id: "blocker"
     }
-  ]
+  ];
 
   function processEvent(event) {
     let action = event.target.dataset.action;
-    console.log('[triage-helper] processing:', action);
+    console.log(`[triage-helper:${bugNumber}] processing: ${action}`);
     if (action === 'wontfix') {
       wontfix();
     }
-    if (action === 'investigate') {
-      investigate();
+    if (action === 'blocker') {
+      blocker();
     }
+    event.preventDefault();
   }
 
   for (let action of actions) {
@@ -51,30 +92,9 @@ function createOverlay() {
     a.href = "#";
     container.appendChild(a);
     a.addEventListener("click", processEvent);
-  } 
+  }
 
   document.body.appendChild(container);
 }
 
-function showOverlay() {
-  document.getElementById('bugzilla-triage-helper').style.display = 'block';
-}
-
-function hideOverlay() {
-  document.getElementById('bugzilla-triage-helper').style.display = 'none';
-}
-
-function handler(request, sender) {
-  createOverlay();
-  console.log('[triage-helper] setting overlay to:', request.show);
-  if (request.show === true) {
-    showOverlay();
-  }
-  if (request.show === false) {
-    hideOverlay();
-  }
-}
-
-browser.runtime.onMessage.addListener(handler);
-
-
+createOverlay();

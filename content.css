@@ -1,19 +1,20 @@
 #bugzilla-triage-helper {
     position: fixed;
     top: 1em;
-    left: 1em;
+    right: 1em;
     width: 10em;
     height: 15em;
     border: 1px solid lightgrey;
     padding: 1em;
     z-index: 1000;
     background: white;
+    box-shadow: .4em .4em .4em lightgrey;
 }
 
 #bugzilla-triage-helper img {
     position: fixed;
     top: 0.8em;
-    left: 0.8em;
+    right: 0.3em;
     z-index: 1001;
     height: 16px;
     width: 16px;
@@ -27,12 +28,9 @@
     padding: 0.3em;
     margin-bottom: 0.2em;
     text-transform: lowercase;
+    background: grey;
 }
 
-#bugzilla-triage-helper a.action-wontfix {
+#bugzilla-triage-helper a.action-blocker {
     background: firebrick;
-}
-
-#bugzilla-triage-helper a.action-investigate {
-    background: darkolivegreen;
 }
