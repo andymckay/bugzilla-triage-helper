@@ -1,8 +1,4 @@
-let changeEvent = new UIEvent('change');
-let urlObj = new URL(window.location);
-let params = new URLSearchParams(urlObj.search);
-let bugNumber = params.get('id');
-
+// ----------------------------
 
 function wontfix() {
   console.log(`[triage-helper:${bugNumber}] in wontfix`);
@@ -14,6 +10,37 @@ function blocker() {
   console.log(`[triage-helper:${bugNumber}] in blocker`);
   changePriority('P1', 'blocker');
 }
+
+function reset() {
+  console.log(`[triage-helper:${bugNumber}] resetting`);
+  window.location.reload(true);
+}
+
+let actions = [
+  {
+    text: "Won't fix",
+    id: "wontfix",
+    func: wontfix
+  },
+  {
+    text: "P1 Blocker",
+    id: "blocker",
+    func: blocker
+  },
+  {
+    text: "Reset",
+    id: "reset",
+    func: reset
+  }
+];
+
+// ----------------------------
+
+let changeEvent = new UIEvent('change');
+let urlObj = new URL(window.location);
+let params = new URLSearchParams(urlObj.search);
+let bugNumber = params.get('id');
+let versions = null;
 
 function insertCommentAndMoveTo(text) {
   console.log(`[triage-helper:${bugNumber}] inserting comment`);
@@ -61,25 +88,13 @@ function createOverlay() {
   img.title = 'Bugzilla Triage Helper';
   container.appendChild(img);
 
-  let actions = [
-    {
-      text: "Won't fix",
-      id: "wontfix"
-    },
-    {
-      text: "P1 Blocker",
-      id: "blocker"
-    }
-  ];
-
   function processEvent(event) {
     let action = event.target.dataset.action;
     console.log(`[triage-helper:${bugNumber}] processing: ${action}`);
-    if (action === 'wontfix') {
-      wontfix();
-    }
-    if (action === 'blocker') {
-      blocker();
+    for (let a of actions) {
+      if (a.id === action) {
+        a.func.apply();
+      }
     }
     event.preventDefault();
   }
@@ -95,6 +110,12 @@ function createOverlay() {
   }
 
   document.body.appendChild(container);
+
 }
 
 createOverlay();
+
+browser.runtime.sendMessage({action: 'getVersions'})
+.then((response) => {
+  versions = response;
+});
