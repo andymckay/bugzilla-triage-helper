@@ -18,6 +18,13 @@ function handleMessage(request, sender, sendResponse) {
   if (request.action === 'getVersions') {
     sendResponse(versions);
   }
+  if (request.action == 'getConfig') {
+    browser.storage.local.get()
+    .then(data => {
+      sendResponse(data);
+    });
+  }
+  return true;
 }
 
 browser.runtime.onMessage.addListener(handleMessage);

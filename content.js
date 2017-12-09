@@ -9,6 +9,7 @@ function wontfix() {
 function blocker() {
   console.log(`[triage-helper:${bugNumber}] in blocker`);
   changePriority('P1', 'blocker');
+  setFlag('LATEST_FIREFOX_VERSION', 'affected');
 }
 
 function reset() {
@@ -23,7 +24,7 @@ let actions = [
     func: wontfix
   },
   {
-    text: "P1 Blocker",
+    text: "Blocker",
     id: "blocker",
     func: blocker
   },
@@ -36,21 +37,44 @@ let actions = [
 
 // ----------------------------
 
+let userConfig = null;
 let changeEvent = new UIEvent('change');
+let clickEvent = new UIEvent('click');
 let urlObj = new URL(window.location);
 let params = new URLSearchParams(urlObj.search);
 let bugNumber = params.get('id');
 let versions = null;
+let newSkin = document.body.classList.contains('skin-Mozilla');
+
+function log(msg) {
+  console.log(`[triage-helper:${bugNumber}] ${msg}.`);
+}
+
+function roundFirefoxVersion(version) {
+  return version.split('.')[0];
+}
 
 function insertCommentAndMoveTo(text) {
-  console.log(`[triage-helper:${bugNumber}] inserting comment`);
+  log(`inserting comment`);
   let comment = document.getElementById('comment');
   comment.value = text;
   comment.focus();
 }
 
+function setFlag(version, status) {
+  log(`setting ${version}`);
+  let versionNum = roundFirefoxVersion(versions[version]);
+  let statusElement = document.getElementById(`cf_status_firefox${versionNum}`);
+  statusElement.value = status;
+  statusElement.dispatchEvent(changeEvent);
+
+  if (newSkin) {
+    document.getElementById('module-firefox-tracking-flags-header').children[0].dispatchEvent(clickEvent);
+  }
+}
+
 function changePriority(priority, severity) {
-  console.log(`[triage-helper:${bugNumber}] changing priority`);
+  log(`changing priority ${priority}`);
   let priorityElement = document.getElementById('priority');
   priorityElement.value = priority;
   priorityElement.dispatchEvent(changeEvent);
@@ -62,7 +86,7 @@ function changePriority(priority, severity) {
 }
 
 function changeStatus(status, resolution, duplicate) {
-  console.log(`[triage-helper:${bugNumber}] changing status`);
+  log(`changing status ${status}`);
   let statusElement = document.getElementById('bug_status');
   let resolutionElement = document.getElementById('resolution');
   let duplicateElement = document.getElementById('dup_id');
@@ -90,9 +114,15 @@ function createOverlay() {
 
   function processEvent(event) {
     let action = event.target.dataset.action;
-    console.log(`[triage-helper:${bugNumber}] processing: ${action}`);
+    log(`processing: ${action}`);
     for (let a of actions) {
       if (a.id === action) {
+        let mode = document.getElementById('mode-btn');
+        log(mode.style.display);
+        if (!mode.style.display) {
+          log('changing mode');
+          mode.dispatchEvent(clickEvent);
+        }
         a.func.apply();
       }
     }
@@ -110,7 +140,6 @@ function createOverlay() {
   }
 
   document.body.appendChild(container);
-
 }
 
 createOverlay();
@@ -118,4 +147,20 @@ createOverlay();
 browser.runtime.sendMessage({action: 'getVersions'})
 .then((response) => {
   versions = response;
+  /* The dev server does not have up to date versions, so this changes them
+   * to be ones that might make sense there.
+   */
+  if (urlObj.host === 'bugzilla-dev.allizom.org') {
+    versions.FIREFOX_NIGHTLY = '40.0a1';
+    versions.LATEST_FIREFOX_DEVEL_VERSION = '39.0b2';
+    versions.LATEST_FIREFOX_VERSION = '38.0.1';
+  }
+  log(versions);
 });
+
+browser.runtime.sendMessage({action: 'getConfig'})
+.then((response) => {
+  userConfig = response;
+});
+
+log('... loaded.');

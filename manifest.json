@@ -6,7 +6,7 @@
     },
     "permissions": [
         "activeTab",
-        "tabs"
+        "storage"
     ],
     "browser_action": {
         "default_title": "Bugzilla Triage Helper Configuration",

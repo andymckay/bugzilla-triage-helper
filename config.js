@@ -6,3 +6,22 @@ browser.runtime.sendMessage({action: 'getVersions'})
   }
   document.getElementById('versions').innerText = text;
 });
+
+var config = null;
+browser.storage.local.get()
+.then(data => {
+  config = data;
+  for (let element of document.querySelectorAll('input')) {
+    element.addEventListener('click', processForm);
+    element.checked = config[element.dataset.key] || false;
+  }
+});
+
+function processForm(event) {
+  if (event.target.checked) {
+    config[event.target.dataset.key] = true;
+  } else {
+    config[event.target.dataset.key] = false;
+  }
+  browser.storage.local.set(config);
+}
