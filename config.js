@@ -18,10 +18,31 @@ async function setupPage() {
       }
       document.getElementById("versions").innerText = text;
     });
+
   button.disabled = false;
   button.addEventListener("click", processForm);
+
   document.getElementById("email").value = config.email ? config.email : "";
   document.getElementById("submit").value = config.submit ? "yes" : "no";
+
+  let actionsElement = document.getElementById("actions");
+  for (let key of Object.keys(actions)) {
+    let action = actions[key];
+    let name = document.createElement("h5");
+    name.innerText = action.text;
+    actionsElement.appendChild(name);
+
+    for (let eventKey of Object.keys(action.events)) {
+      let eventElement = document.createElement("div");
+      let args = action.events[eventKey].join(", ");
+      eventElement.innerText = `${eventKey} > ${args}`;
+      actionsElement.appendChild(eventElement);
+    }
+
+    let kbd = document.createElement("kbd");
+    kbd.innerText = `Ctrl+${action.keyboard}`;
+    actionsElement.appendChild(kbd);
+  }
 }
 
 async function processForm(event) {

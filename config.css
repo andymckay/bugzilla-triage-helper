@@ -5,6 +5,7 @@ h1 {
 }
 
 h4 {
+    padding-top: 1em;
     border-bottom: 1px solid #666;
     color: black;
 }
@@ -15,4 +16,12 @@ body {
 
 .alert-danger {
     padding: 1em;
+}
+
+#actions div, #actions kbd {
+    margin-left: 1em;
+}
+
+#actions h5 {
+    padding-top: 1em;
 }
