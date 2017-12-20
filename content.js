@@ -1,42 +1,3 @@
-// ----------------------------
-
-function wontfix() {
-  log(`[triage-helper:${bugNumber}] in wontfix`);
-  insertCommentAndMoveTo("Won't fixing this bug.");
-  changeStatus('RESOLVED', 'WONTFIX');
-}
-
-function blocker() {
-  log(`[triage-helper:${bugNumber}] in blocker`);
-  changePriority('P1', 'blocker');
-  setFlag('LATEST_FIREFOX_VERSION', 'affected');
-}
-
-function reset() {
-  log(`[triage-helper:${bugNumber}] resetting`);
-  window.location.reload(true);
-}
-
-let actions = [
-  {
-    text: "Won't fix",
-    id: "wontfix",
-    func: wontfix
-  },
-  {
-    text: "Blocker",
-    id: "blocker",
-    func: blocker
-  },
-  {
-    text: "Reset",
-    id: "reset",
-    func: reset
-  }
-];
-
-// ----------------------------
-
 let userConfig = null;
 let changeEvent = new UIEvent('change');
 let clickEvent = new UIEvent('click');
@@ -61,7 +22,8 @@ function insertCommentAndMoveTo(text) {
   comment.focus();
 }
 
-function setFlag(version, status) {
+let eventFunctions = new Object();
+eventFunctions.flag = function(version, status) {
   log(`setting ${version}`);
   let versionNum = roundFirefoxVersion(versions[version]);
   let statusElement = document.getElementById(`cf_status_firefox${versionNum}`);
@@ -71,9 +33,9 @@ function setFlag(version, status) {
   if (newSkin) {
     document.getElementById('module-firefox-tracking-flags-header').children[0].dispatchEvent(clickEvent);
   }
-}
+};
 
-function changePriority(priority, severity) {
+eventFunctions.priority = function(priority, severity) {
   log(`changing priority ${priority}`);
   let priorityElement = document.getElementById('priority');
   priorityElement.value = priority;
@@ -83,9 +45,9 @@ function changePriority(priority, severity) {
     let severityElement = document.getElementById('bug_severity');
     severityElement.value = severity;
   }
-}
+};
 
-function changeStatus(status, resolution, duplicate) {
+eventFunctions.status = function(status, resolution, duplicate) {
   log(`changing status ${status}`);
   let statusElement = document.getElementById('bug_status');
   let resolutionElement = document.getElementById('resolution');
@@ -101,6 +63,18 @@ function changeStatus(status, resolution, duplicate) {
       duplicateElement.value = duplicate;
     }
   }
+};
+
+function processAction(action) {
+  let mode = document.getElementById('mode-btn');
+  if (mode && !mode.style.display) {
+    log('changing mode');
+    mode.dispatchEvent(clickEvent);
+  }
+  for (let key of Object.keys(action.events)) {
+    let args = action.events[key];
+    eventFunctions[key].apply(null, args);
+  }
 }
 
 function createOverlay() {
@@ -113,16 +87,11 @@ function createOverlay() {
   container.appendChild(img);
 
   function processEvent(event) {
-    let action = event.target.dataset.action;
-    log(`processing: ${action}`);
-    for (let a of actions) {
-      if (a.id === action) {
-        let mode = document.getElementById('mode-btn');
-        if (mode && !mode.style.display) {
-          log('changing mode');
-          mode.dispatchEvent(clickEvent);
-        }
-        a.func.apply();
+    let actionEvent = event.target.dataset.action;
+
+    for (let action of actions) {
+      if (action.id === actionEvent) {
+        processAction(action);
       }
     }
     event.preventDefault();
@@ -140,6 +109,17 @@ function createOverlay() {
 
   document.body.appendChild(container);
 }
+
+document.addEventListener('keypress', (event) => {
+  if (event.ctrlKey) {
+    for (let action of actions) {
+      if (action.keyboard === event.key) {
+        log(`Found action for Ctrl+${event.key}: ${action.id}`);
+        processAction(action);
+      }
+    }
+  }
+}, false);
 
 createOverlay();
 
