@@ -1,19 +1,19 @@
 // ----------------------------
 
 function wontfix() {
-  console.log(`[triage-helper:${bugNumber}] in wontfix`);
+  log(`[triage-helper:${bugNumber}] in wontfix`);
   insertCommentAndMoveTo("Won't fixing this bug.");
   changeStatus('RESOLVED', 'WONTFIX');
 }
 
 function blocker() {
-  console.log(`[triage-helper:${bugNumber}] in blocker`);
+  log(`[triage-helper:${bugNumber}] in blocker`);
   changePriority('P1', 'blocker');
   setFlag('LATEST_FIREFOX_VERSION', 'affected');
 }
 
 function reset() {
-  console.log(`[triage-helper:${bugNumber}] resetting`);
+  log(`[triage-helper:${bugNumber}] resetting`);
   window.location.reload(true);
 }
 
@@ -118,8 +118,7 @@ function createOverlay() {
     for (let a of actions) {
       if (a.id === action) {
         let mode = document.getElementById('mode-btn');
-        log(mode.style.display);
-        if (!mode.style.display) {
+        if (mode && !mode.style.display) {
           log('changing mode');
           mode.dispatchEvent(clickEvent);
         }
@@ -155,12 +154,9 @@ browser.runtime.sendMessage({action: 'getVersions'})
     versions.LATEST_FIREFOX_DEVEL_VERSION = '39.0b2';
     versions.LATEST_FIREFOX_VERSION = '38.0.1';
   }
-  log(versions);
 });
 
 browser.runtime.sendMessage({action: 'getConfig'})
 .then((response) => {
   userConfig = response;
 });
-
-log('... loaded.');
