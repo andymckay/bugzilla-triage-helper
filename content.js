@@ -5,7 +5,7 @@ let urlObj = new URL(window.location);
 let params = new URLSearchParams(urlObj.search);
 let bugNumber = params.get("id");
 let versions = null;
-let newSkin = document.body.classList.contains("skin-Mozilla");
+let newSkin = document.body.classList.contains("bug_modal");
 
 function log(msg) {
   console.log(`[triage-helper:${bugNumber}] ${msg}.`); // eslint-disable-line no-console
@@ -23,15 +23,18 @@ let eventFunctions = {
     comment.focus();
   },
   flag: function(version, status) {
-    log(`setting ${version}`);
     let versionNum = roundFirefoxVersion(versions[version]);
+    log(`setting Firefox ${versionNum} to ${status}`);
+
+    if (newSkin && document.getElementById("module-firefox-tracking-flags-content").style.display === "none") {
+      document.getElementById("module-firefox-tracking-flags-header").children[0].dispatchEvent(clickEvent);
+    } else {
+      document.getElementsByClassName("edit_tracking_flags_link")[0].dispatchEvent(clickEvent);
+    }
+
     let statusElement = document.getElementById(`cf_status_firefox${versionNum}`);
     statusElement.value = status;
     statusElement.dispatchEvent(changeEvent);
-
-    if (newSkin) {
-      document.getElementById("module-firefox-tracking-flags-header").children[0].dispatchEvent(clickEvent);
-    }
   },
   priority: function(priority, severity) {
     log(`changing priority ${priority}`);
@@ -64,14 +67,40 @@ let eventFunctions = {
 };
 
 function processAction(action) {
-  let mode = document.getElementById("mode-btn");
-  if (mode && !mode.style.display) {
-    log("changing mode");
-    mode.dispatchEvent(clickEvent);
+  // All the jiggles to get around the modal skin.
+  if (newSkin) {
+    let mode = document.getElementById("mode-btn");
+    var observer = new MutationObserver(changed);
+
+    if (!mode.style.display) {
+      mode.dispatchEvent(clickEvent);
+      observer.observe(mode, {attributes: true, childList: true});
+    } else {
+      process(action);
+    }
+  } else {
+    process(action);
   }
-  for (let key of Object.keys(action.events)) {
-    let args = action.events[key];
-    eventFunctions[key].apply(null, args);
+
+  function changed(mutationList) {
+    if (mutationList[0].target.disabled) {
+      process(action);
+      observer.disconnect();
+    }
+  }
+
+  function process() {
+    for (let key of Object.keys(action.events)) {
+      let args = action.events[key];
+      if (key === "flag") {
+        // TODO: would like to move this logic down into flags.
+        for (let eachArgs of action.events[key]) {
+          eventFunctions[key].apply(null, eachArgs);
+        }
+      } else {
+        eventFunctions[key].apply(null, args);
+      }
+    }
   }
 }
 
@@ -89,7 +118,7 @@ function createOverlay() {
 
     for (let action of actions) {
       if (action.id === actionEvent) {
-        log(`Found action for ${actionEvent}`);
+        log(`Found action for button: ${actionEvent}`);
         processAction(action);
         break;
       }
