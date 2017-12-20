@@ -1,6 +1,18 @@
 let versions = null;
 let FIREFOX_VERSION_URL = "https://product-details.mozilla.org/1.0/firefox_versions.json";
-let BUGZILLA_PARAMS = "?priority=--&f1=triage_owner&o1=equals&resolution=---&o2=notequals&query_format=advanced&f2=flagtypes.name&v2=needinfo%3F&include_fields=id";
+let BUGZILLA_PARAMS = [
+  "priority=--",
+  "f1=triage_owner",
+  "o1=equals",
+  // Note: v1 is inserted as the user email.
+  "resolution=---",
+  "include_fields=id", // this makes the query much faster.
+  "chfield=%5BBug%20creation%5D",
+  "chfieldfrom=-60d", // only show bugs created up to 60 days ago;
+  "f3=keywords",
+  "o3=notequals",
+  "v3=meta",
+].join("&");
 let BUGZILLA_BROWSER_URL = "https://bugzilla.mozilla.org/buglist.cgi";
 let BUGZILLA_QUERY_URL = "https://bugzilla.mozilla.org/rest/bug";
 let BUGZILLA_REFRESH_INTERVAL = 60 * 2 * 1000;
@@ -15,7 +27,7 @@ browser.browserAction.onClicked.addListener(() => {
       if (!data.email) {
         browser.tabs.create({"url": "/config.html?msg=msg-no-email"});
       } else {
-        browser.tabs.create({"url": `${BUGZILLA_BROWSER_URL}${BUGZILLA_PARAMS}&v1=${data.email}`});
+        browser.tabs.create({"url": `${BUGZILLA_BROWSER_URL}?${BUGZILLA_PARAMS}&v1=${data.email}`});
       }
     });
 });
@@ -37,7 +49,7 @@ let fetches = {
       log("No email, not fetching");
     }
 
-    let url = `${BUGZILLA_QUERY_URL}${BUGZILLA_PARAMS}&v1=${data.email}`;
+    let url = `${BUGZILLA_QUERY_URL}?${BUGZILLA_PARAMS}&v1=${data.email}`;
     let res = await fetch(url);
     let json = await res.json();
     await browser.storage.local.set({bugs: {count: json.bugs.length, when: Date.now()}});
