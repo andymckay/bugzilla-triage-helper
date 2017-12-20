@@ -2,10 +2,10 @@
     position: fixed;
     top: 1em;
     right: 1em;
-    width: 10em;
+    width: 11em;
     height: 15em;
     border: 1px solid lightgrey;
-    padding: 1em;
+    padding: 0.5em;
     z-index: 1000;
     background: white;
     box-shadow: .4em .4em .4em lightgrey;
@@ -16,21 +16,35 @@
     top: 0.8em;
     right: 0.3em;
     z-index: 1001;
-    height: 16px;
-    width: 16px;
+    height: 22px;
+    width: 22px;
     border: none;
 }
 
-#bugzilla-triage-helper a {
+#bugzilla-triage-helper div {
+    padding-bottom: .4rem;
     display: block;
-    color: white;
-    font-weight: bold;
-    padding: 0.3em;
-    margin-bottom: 0.2em;
-    text-transform: lowercase;
-    background: grey;
 }
 
-#bugzilla-triage-helper a.action-blocker {
-    background: firebrick;
+#bugzilla-triage-helper a {
+    padding: .2rem .4rem;
+    color: #fff;
+    background-color: #212529;
+    border-radius: .2rem 0 0 .2rem;
+    width: 5.2rem;
+    display: inline-block;
+    text-decoration: none;
+}
+
+#bugzilla-triage-helper a:hover {
+    background-color: firebrick;
+}
+
+#bugzilla-triage-helper span {
+    border-radius: 0 .2rem .2rem 0;
+    color: grey;
+    background-color: lightgrey;
+    padding: .2rem .4rem;
+    margin-top: 0;
+    display: inline-block;
 }

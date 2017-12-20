@@ -98,13 +98,20 @@ function createOverlay() {
   }
 
   for (let action of actions) {
+    let div = document.createElement("div");
     let a = document.createElement("a");
     a.innerText = action.text;
     a.className = `action-${action.id}`;
     a.dataset.action = action.id;
     a.href = "#";
-    container.appendChild(a);
+
     a.addEventListener("click", processEvent);
+    let kbd = document.createElement("span");
+    kbd.innerText = `Ctrl+${action.keyboard}`;
+
+    div.appendChild(a);
+    div.appendChild(kbd);
+    container.appendChild(div);
   }
 
   document.body.appendChild(container);
