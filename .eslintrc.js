@@ -4,13 +4,18 @@ module.exports = {
         "es6": true
     },
     "extends": "eslint:recommended",
+    "globals": {
+      "actions": true,
+      "browser": true
+    },
     "parserOptions": {
-        "sourceType": "module"
+        "sourceType": "module",
+        "ecmaVersion": 2017
     },
     "rules": {
         "indent": [
             "error",
-            4
+            2
         ],
         "linebreak-style": [
             "error",
