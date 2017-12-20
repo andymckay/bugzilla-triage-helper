@@ -1,0 +1,18 @@
+h1 {
+    padding-top: 1em;
+    font-size: 2em;
+    color: black;
+}
+
+h4 {
+    border-bottom: 1px solid #666;
+    color: black;
+}
+
+body {
+    color: #444;
+}
+
+.alert-danger {
+    padding: 1em;
+}
