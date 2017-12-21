@@ -4,7 +4,7 @@ The goal of Bugzilla Triage Helper is to provide an easy and standard interface 
 
 ### Configuration
 
-Click the browser action button (its a blue ?) and go to the configuration page. Enter your email address. The tool will then automatically get the query to triage from Bugzilla based on that email address. Click update.
+Click the browser action button (its a blue question mark) and go to the configuration page. Enter your email address. The tool will then automatically get the query to triage from Bugzilla based on that email address. Click update.
 
 In a minute you'll notice that the count on the browser action will have changed from 0 to the number of bugs you have to triage. Sorry about that.
 
@@ -12,7 +12,7 @@ You can also set the tool to automatically submit after each use, this is not re
 
 Scroll down to get a list of the actions and what they do.
 
-To return to the configuration page later, go to about:addons > Bugzilla Triage Helper > Preferences.
+To return to the configuration page later, go to *about:addons > Bugzilla Triage Helper > Preferences*.
 
 ### Triaging
 
