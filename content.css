@@ -3,7 +3,7 @@
     top: 1em;
     right: 1em;
     width: 11em;
-    height: 17.3em;
+    height: 19.3em;
     border: 1px solid lightgrey;
     padding: 0.5em;
     z-index: 1000;
@@ -21,12 +21,12 @@
     border: none;
 }
 
-#bugzilla-triage-helper div {
+#bugzilla-triage-helper div.action {
     padding-bottom: .4rem;
     display: block;
 }
 
-#bugzilla-triage-helper a {
+#bugzilla-triage-helper div.action a {
     padding: .2rem .4rem;
     color: #fff;
     background-color: #212529;
@@ -36,15 +36,23 @@
     text-decoration: none;
 }
 
-#bugzilla-triage-helper a:hover {
+#bugzilla-triage-helper div.action a:hover {
     background-color: firebrick;
 }
 
-#bugzilla-triage-helper span {
+#bugzilla-triage-helper div.action span {
     border-radius: 0 .2rem .2rem 0;
     color: grey;
     background-color: lightgrey;
     padding: .2rem .4rem;
     margin-top: 0;
     display: inline-block;
+}
+
+#bugzilla-triage-helper .auto-commit-on {
+    color: white;
+    background: green;
+    font-weight: bold;
+    padding-left: .2rem;
+    padding-right: .2rem;
 }

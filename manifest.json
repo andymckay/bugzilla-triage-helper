@@ -23,7 +23,9 @@
         {
           "matches": [
               "https://bugzilla.mozilla.org/show_bug*",
-              "https://bugzilla-dev.allizom.org/show_bug*"
+              "https://bugzilla.mozilla.org/process_bug*",
+              "https://bugzilla-dev.allizom.org/show_bug*",
+              "https://bugzilla-dev.allizom.org/process_bug*"
           ],
           "js": ["actions.js", "content.js"],
           "css": ["content.css"],

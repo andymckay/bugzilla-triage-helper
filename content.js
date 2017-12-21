@@ -26,10 +26,14 @@ let eventFunctions = {
     let versionNum = roundFirefoxVersion(versions[version]);
     log(`setting Firefox ${versionNum} to ${status}`);
 
-    if (newSkin && document.getElementById("module-firefox-tracking-flags-content").style.display === "none") {
-      document.getElementById("module-firefox-tracking-flags-header").children[0].dispatchEvent(clickEvent);
+    if (newSkin) {
+      if (document.getElementById("module-firefox-tracking-flags-content").style.display === "none") {
+        document.getElementById("module-firefox-tracking-flags-header").children[0].dispatchEvent(clickEvent);
+      }
     } else {
-      document.getElementsByClassName("edit_tracking_flags_link")[0].dispatchEvent(clickEvent);
+      if (document.getElementById("edit_tracking_flags_action").className === "bz_default_hidden") {
+        document.getElementsByClassName("edit_tracking_flags_link")[0].dispatchEvent(clickEvent);
+      }
     }
 
     let statusElement = document.getElementById(`cf_status_firefox${versionNum}`);
@@ -63,6 +67,10 @@ let eventFunctions = {
         duplicateElement.value = duplicate;
       }
     }
+  },
+  submit: function() {
+    log("Auto-submitting changes");
+    document.getElementById("changeform").submit();
   }
 };
 
@@ -101,6 +109,9 @@ function processAction(action) {
         eventFunctions[key].apply(null, args);
       }
     }
+    if (userConfig.submit) {
+      eventFunctions.submit();
+    }
   }
 }
 
@@ -128,6 +139,7 @@ function createOverlay() {
 
   for (let action of actions) {
     let div = document.createElement("div");
+    div.className = "action";
     let a = document.createElement("a");
     a.innerText = action.text;
     a.className = `action-${action.id}`;
@@ -143,6 +155,15 @@ function createOverlay() {
     container.appendChild(div);
   }
 
+  let autoCommit = document.createElement("div");
+  autoCommit.innerText = "Auto submit: ";
+
+  let autoCommitElement = document.createElement("span");
+  autoCommitElement.className = userConfig.submit ? "auto-commit-on" : "auto-commit-off";
+  autoCommitElement.innerText = userConfig.submit ? "on" : "off";
+
+  autoCommit.appendChild(autoCommitElement);
+  container.appendChild(autoCommit);
   document.body.appendChild(container);
 }
 
@@ -157,8 +178,6 @@ document.addEventListener("keypress", (event) => {
     }
   }
 }, false);
-
-createOverlay();
 
 browser.runtime.sendMessage({action: "getVersions"})
   .then((response) => {
@@ -176,4 +195,5 @@ browser.runtime.sendMessage({action: "getVersions"})
 browser.runtime.sendMessage({action: "getConfig"})
   .then((response) => {
     userConfig = response;
+    createOverlay();
   });
