@@ -47,7 +47,7 @@ let actions = [ // eslint-disable-line no-unused-vars
     text: "Priority one",
     id: "priorityone",
     events: {
-      priority: ["P1", "enhancement"],
+      priority: ["P1"],
       flag: [
         ["LATEST_FIREFOX_VERSION", "affected"],
       ],
