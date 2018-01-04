@@ -1,6 +1,6 @@
 #bugzilla-triage-helper {
     position: fixed;
-    top: 1em;
+    top: 4em;
     right: 1em;
     width: 11em;
     height: 19.3em;
@@ -13,7 +13,7 @@
 
 #bugzilla-triage-helper img {
     position: fixed;
-    top: 0.8em;
+    top: 3.8em;
     right: 0.3em;
     z-index: 1001;
     height: 22px;
