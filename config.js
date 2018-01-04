@@ -59,6 +59,8 @@ async function processForm(event) {
   button.innerText = "Saved";
   button.className = "btn btn-success";
   window.setTimeout(revertButton, 1000);
+
+  browser.runtime.sendMessage({action: "updateCount"});
 }
 
 setupPage();

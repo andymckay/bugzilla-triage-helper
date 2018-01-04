@@ -40,13 +40,14 @@ let fetches = {
   },
   getBugCount: async function() {
     let data = await browser.storage.local.get();
+    if (!data.email) {
+      log("No email, not fetching");
+      return null;
+    }
+
     if (data.bugs && ((Date.now() - data.bugs.when) < BUGZILLA_REFRESH_INTERVAL)) {
       log("returning from cache");
       return data.bugs.count;
-    }
-
-    if (!data.email) {
-      log("No email, not fetching");
     }
 
     let url = `${BUGZILLA_QUERY_URL}?${BUGZILLA_PARAMS}&v1=${data.email}`;
@@ -58,11 +59,14 @@ let fetches = {
   },
   showBugCount: async function() {
     let count = await fetches.getBugCount();
+    if (count === null) {
+      return;
+    }
     let countStr = count.toString();
     if (count < 10) {
       browser.browserAction.setBadgeBackgroundColor({color: "green"});
     } else if (count > 50) {
-      browser.browserAction.setBadgeBackgroundColor({color: "red"});
+      browser.browserAction.setBadgeBackgroundColor({color: "orange"});
     } if (count > 99) {
       countStr = "99+";
     }
@@ -74,11 +78,14 @@ function handleMessage(request, sender, sendResponse) {
   if (request.action === "getVersions") {
     sendResponse(versions);
   }
-  if (request.action == "getConfig") {
+  if (request.action === "getConfig") {
     browser.storage.local.get()
       .then(data => {
         sendResponse(data);
       });
+  }
+  if (request.action === "updateCount") {
+    fetches.showBugCount();
   }
   return true;
 }
