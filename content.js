@@ -19,7 +19,8 @@ let eventFunctions = {
   comment: function(text) {
     log("inserting comment");
     let comment = document.getElementById("comment");
-    comment.value = text;
+    let oldText = comment.value || "";
+    comment.value = `${text}${oldText ? "\n\n" : ""}${oldText}`;
     comment.focus();
   },
   flag: function(version, status) {
