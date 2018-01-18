@@ -1,23 +1,23 @@
 let versions = null;
 let FIREFOX_VERSION_URL = "https://product-details.mozilla.org/1.0/firefox_versions.json";
 let BUGZILLA_PARAMS = [
-  "chfield": "%5BBug%20creation%5D",
-  "chfieldfrom": "-60d", // sixty days previous
-  "chfieldto": "Now",
-  "f1": "triage_owner",
-  "f3": "keywords",
-  "f4": "bug_severity",
-  "include_fields:": "id", // only return ids since it's faster and we're just counting bugs
-  "o1": "equals",
-  "o3": "notequals",
-  "o4": "notequals",
-  "priority": "--",
-  "resolution": "---",
-  "short_desc": "^\[meta\]", // alternative standard for metabugs
-  "short_desc_type": "notregexp",
+  "chfield=%5BBug%20creation%5D",
+  "chfieldfrom=-60d", // sixty days previous
+  "chfieldto=Now",
+  "f1=triage_owner",
+  "f3=keywords",
+  "f4=bug_severity",
+  "include_fields:=id", // only return ids since it's faster and we're just counting bugs
+  "o1=equals",
+  "o3=notequals",
+  "o4=notequals",
+  "priority=--",
+  "resolution=---",
+  "short_desc=^\%5Bmeta\%5D", // alternative standard for metabugs
+  "short_desc_type=notregexp",
   // v1	is supplied from userinfo
-  "v3": "meta", // feature or tracking
-  "v4": "enhancement", // feature
+  "v3=meta", // feature or tracking
+  "v4=enhancement", // feature
 ].join("&");
 let BUGZILLA_BROWSER_URL = "https://bugzilla.mozilla.org/buglist.cgi";
 let BUGZILLA_QUERY_URL = "https://bugzilla.mozilla.org/rest/bug";
