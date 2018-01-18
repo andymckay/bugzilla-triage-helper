@@ -49,7 +49,7 @@ let actions = [ // eslint-disable-line no-unused-vars
     events: {
       priority: ["P1"],
       flag: [
-        ["LATEST_FIREFOX_VERSION", "affected"],
+        ["FIREFOX_NIGHTLY", "affected"]
       ],
       status: ["NEW"],
     },
@@ -71,8 +71,7 @@ let actions = [ // eslint-disable-line no-unused-vars
     events: {
       priority: ["P2"],
       flag: [
-        ["LATEST_FIREFOX_VERSION", "wontfix"],
-        ["LATEST_FIREFOX_DEVEL_VERSION", "affected"]
+        ["FIREFOX_NIGHTLY", "fix-optional"]
       ],
       status: ["NEW"]
     },
