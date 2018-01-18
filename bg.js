@@ -13,7 +13,7 @@ let BUGZILLA_PARAMS = [
   "o4=notequals",
   "priority=--",
   "resolution=---",
-  "short_desc=^\%5Bmeta\%5D", // alternative standard for metabugs
+  "short_desc=^\\%5Bmeta", // alternative standard for metabugs
   "short_desc_type=notregexp",
   // v1	is supplied from userinfo
   "v3=meta", // feature or tracking
