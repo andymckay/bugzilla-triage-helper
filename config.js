@@ -3,9 +3,14 @@ var button = document.querySelectorAll("button")[0];
 let urlObj = new URL(window.location);
 let params = new URLSearchParams(urlObj.search);
 
+function getMsg(msg) {
+  return document.getElementById(msg);
+}
+
 async function setupPage() {
-  if (params.get("msg")) {
-    document.getElementById(params.get("msg")).style.display = "block";
+  let msg = params.get("msg");
+  if (msg) {
+    getMsg(msg).style.display = "block";
   }
 
   config = await browser.storage.local.get();
@@ -59,6 +64,11 @@ async function processForm(event) {
   button.innerText = "Saved";
   button.className = "btn btn-success";
   window.setTimeout(revertButton, 1000);
+
+  let msg = params.get("msg");
+  if (config.email && msg) {
+    getMsg(msg).style.display = "none";
+  }
 
   browser.runtime.sendMessage({action: "updateCount"});
 }

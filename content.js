@@ -180,6 +180,10 @@ document.addEventListener("keypress", (event) => {
   }
 }, false);
 
+function isLoggedIn() {
+  return document.getElementById("login_link_top") === null;
+}
+
 browser.runtime.sendMessage({action: "getVersions"})
   .then((response) => {
     versions = response;
@@ -193,8 +197,10 @@ browser.runtime.sendMessage({action: "getVersions"})
     }
   });
 
-browser.runtime.sendMessage({action: "getConfig"})
-  .then((response) => {
-    userConfig = response;
-    createOverlay();
-  });
+if (isLoggedIn()) {
+  browser.runtime.sendMessage({action: "getConfig"})
+    .then((response) => {
+      userConfig = response;
+      createOverlay();
+    });
+}
