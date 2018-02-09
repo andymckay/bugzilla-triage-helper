@@ -40,6 +40,14 @@
             </select>
           </div>
           <div class="form-group">
+            <label class="col-form-label" for="submit">Add to cc?</label>
+            <select class="form-control" type="select" id="cc" data-key="cc">
+              <option value="yes">Yes, add to the cc.</option>
+              <option value="default">Default to whatever Bugzilla does.</option>
+              <option value="no" default>No, don't add to the cc.</option>
+            </select>
+          </div>
+          <div class="form-group">
             <button type="submit" class="btn btn-primary" disabled>Update</button>
           </div>
         </form>

@@ -16,6 +16,14 @@ function roundFirefoxVersion(version) {
 }
 
 let eventFunctions = {
+  cc: function(action) {
+    let bool = action === "no" ? false : true;
+    if (newSkin) {
+      document.getElementById("add-self-cc").checked = bool;
+    } else {
+      document.getElementById("addselfcc").checked = bool;
+    }
+  },
   comment: function(text) {
     log("inserting comment");
     let comment = document.getElementById("comment");
@@ -98,7 +106,7 @@ function processAction(action) {
     }
   }
 
-  function process() {
+  function process(action) {
     for (let key of Object.keys(action.events)) {
       let args = action.events[key];
       if (key === "flag") {
@@ -109,6 +117,9 @@ function processAction(action) {
       } else {
         eventFunctions[key].apply(null, args);
       }
+    }
+    if (userConfig.cc !== "default") {
+      eventFunctions.cc(userConfig.cc);
     }
     if (userConfig.submit) {
       eventFunctions.submit();
