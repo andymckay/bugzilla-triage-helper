@@ -94,7 +94,7 @@ let eventFunctions = {
   }
 };
 
-function processAction(action) {
+function processAction(action, config) {
   // All the jiggles to get around the modal skin.
   if (newSkin) {
     let mode = document.getElementById("mode-btn");
@@ -125,6 +125,10 @@ function processAction(action) {
         for (let eachArgs of action.events[key]) {
           eventFunctions[key].apply(null, eachArgs);
         }
+      } else if (key === "comment" && config.canned) {
+        // Insted of the args defined in the config, pass through the canned response.
+        let cannedText = canned[userConfig.canned][config.canned]; // eslint-disable-line no-undef
+        eventFunctions[key].apply(null, [cannedText]);
       } else {
         eventFunctions[key].apply(null, args);
       }
@@ -153,14 +157,70 @@ function createOverlay() {
     for (let action of actions) {
       if (action.id === actionEvent) {
         log(`Found action for button: ${actionEvent}`);
-        processAction(action);
+        processAction(action, {});
         break;
       }
     }
     event.preventDefault();
   }
 
+  function processCanned(event) {
+    let actionEvent = event.target.dataset.parent;
+    let cannedMessage = event.target.dataset.canned;
+
+    for (let action of actions) {
+      if (action.id === actionEvent) {
+        log(`Found action for canned event: ${actionEvent}, message ${cannedMessage}`);
+        processAction(action, {canned: cannedMessage});
+        break;
+      }
+    }
+    hideCanned(event);
+    event.preventDefault();
+  }
+
+  function showCanned(event) {
+    for (let element of document.getElementsByClassName("canned")) {
+      element.style.display = "";
+    }
+    if (event) {
+      event.preventDefault();
+    }
+  }
+
+  function hideCanned(event) {
+    for (let element of document.getElementsByClassName("canned")) {
+      element.style.display = "none";
+    }
+    if (event) {
+      event.preventDefault();
+    }
+  }
+
+  function createCanned(container, action) {
+    for (let key of Object.keys(canned[userConfig.canned])) { // eslint-disable-line no-undef
+      let canned = document.createElement("div");
+      canned.className = "canned";
+      canned.style.display = "none";
+  
+      let a = document.createElement("a");
+      a.innerText = key;
+      a.dataset.canned = key;
+      a.dataset.parent = action.id;
+      a.href = "#"; 
+
+      a.addEventListener("click", processCanned);
+      
+      canned.appendChild(a);
+      container.appendChild(canned);
+    }
+  }
+
   for (let action of actions) {
+    if (action.list === "canned" && !userConfig.canned) {
+      continue;
+    }
+    
     let div = document.createElement("div");
     div.className = "action";
     let a = document.createElement("a");
@@ -169,24 +229,48 @@ function createOverlay() {
     a.dataset.action = action.id;
     a.href = "#";
 
-    a.addEventListener("click", processEvent);
+    
     let kbd = document.createElement("span");
     kbd.innerText = `Ctrl+${action.keyboard}`;
 
     div.appendChild(a);
     div.appendChild(kbd);
     container.appendChild(div);
+
+    if (action.list === "canned") {
+      createCanned(container, action);
+      a.addEventListener("click", showCanned);
+    } else {
+      a.addEventListener("click", processEvent);
+    }
   }
 
-  let autoCommit = document.createElement("div");
-  autoCommit.innerText = "Auto submit: ";
+  function infoElement(infoText, value) {
+    let text = document.createElement("div");
+    text.className = "info";
+    text.innerText = infoText;
 
-  let autoCommitElement = document.createElement("span");
-  autoCommitElement.className = userConfig.submit ? "auto-commit-on" : "auto-commit-off";
-  autoCommitElement.innerText = userConfig.submit ? "on" : "off";
+    let lookup = {
+      true: "on",
+      false: "off",
+      yes: "on",
+      no: "off"
+    };
+    value = lookup[value];
+    let element = document.createElement("span");
+    element.className = `info-${value}`;
+    element.innerText = value;
 
-  autoCommit.appendChild(autoCommitElement);
+    text.appendChild(element);
+    return text;
+  }
+
+  let autoCommit = infoElement("Submit: ", userConfig.submit);
+  let ccChange = infoElement("CC: ", userConfig.cc);
+
   container.appendChild(autoCommit);
+  container.appendChild(ccChange);
+
   document.body.appendChild(container);
 }
 
@@ -210,8 +294,8 @@ browser.runtime.sendMessage({action: "getVersions"})
   .then((response) => {
     versions = response;
     /* The dev server does not have up to date versions, so this changes them
-   * to be ones that might make sense there.
-   */
+  * to be ones that might make sense there.
+  */
     if (urlObj.host === "bugzilla-dev.allizom.org") {
       versions.FIREFOX_NIGHTLY = "40.0a1";
       versions.LATEST_FIREFOX_DEVEL_VERSION = "39.0b2";

@@ -30,6 +30,7 @@ async function setupPage() {
   document.getElementById("email").value = config.email ? config.email : "";
   document.getElementById("submit").value = config.submit ? "yes" : "no";
   document.getElementById("cc").value = config.cc ? config.cc : "default";
+  document.getElementById("canned").value = config.canned ? config.canned : "";
 
   let actionsElement = document.getElementById("actions");
   for (let key of Object.keys(actions)) {
@@ -61,6 +62,7 @@ async function processForm(event) {
   config.email = document.getElementById("email").value;
   config.submit = document.getElementById("submit").value === "yes" ? true : false;
   config.cc = document.getElementById("cc").value;
+  config.canned = document.getElementById("canned").value;
   await browser.storage.local.set(config);
 
   button.innerText = "Saved";

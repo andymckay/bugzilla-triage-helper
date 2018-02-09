@@ -77,4 +77,13 @@ let actions = [ // eslint-disable-line no-unused-vars
     },
     keyboard: "8",
   },
+  {
+    text: "Canned",
+    id: "canned",
+    events: {
+      comment: null
+    },
+    list: "canned",
+    keyboard: "9"
+  }
 ];

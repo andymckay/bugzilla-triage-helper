@@ -27,7 +27,7 @@
               "https://bugzilla-dev.allizom.org/show_bug*",
               "https://bugzilla-dev.allizom.org/process_bug*"
           ],
-          "js": ["actions.js", "content.js"],
+          "js": ["actions.js", "canned.js", "content.js"],
           "css": ["content.css"],
           "run_at": "document_end"
         }
