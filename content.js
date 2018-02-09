@@ -66,8 +66,19 @@ let eventFunctions = {
     let resolutionElement = document.getElementById("resolution");
     let duplicateElement = document.getElementById("dup_id");
 
-    statusElement.value = status;
-    statusElement.dispatchEvent(changeEvent);
+    // This ranking mechanism is used to avoid overriding fields which have
+    // already been refined by developers.
+    let statusRanks = {
+      "UNCONFIRMED": 0,
+      "NEW" : 1,
+      "ASSSIGNED" : 1,
+      "RESOLVED": 3
+    };
+
+    if (statusRanks[status] > statusRanks[statusElement.value]) {
+      statusElement.value = status;
+      statusElement.dispatchEvent(changeEvent);
+    }
 
     if (status === "RESOLVED") {
       resolutionElement.value = resolution;
