@@ -256,7 +256,7 @@ function createOverlay() {
       yes: "on",
       no: "off"
     };
-    value = lookup[value] || "off";
+    value = lookup[value] || "unset";
     let element = document.createElement("span");
     element.className = `info-${value}`;
     element.innerText = value;
