@@ -33,35 +33,35 @@ let additionalEvents = { // eslint-disable-line no-unused-vars
   // Issue 21
   "Core|Graphics: WebRender|priorityone": {
     "Blocking Nightly": {
-        blocking: ["1386665"]
+      blocking: ["1386665"]
     },
     "Blocking Trains": {
-        blocking: ["1386669"]
+      blocking: ["1386669"]
     }
   },
   "Core|Graphics: WebRender|defer": {
     "Blocking Trains": {
-        blocking: ["1386669"]
+      blocking: ["1386669"]
     }
   },
   "Core|Graphics: WebRender|backlog": {
     "Blocking Backlog": {
-        blocking: ["1386670"]
+      blocking: ["1386670"]
     }
   },
   "Core|Graphics|priorityone": {
     "Whiteboard": {
-        whiteboard: ["[gfx-noted]"]
+      whiteboard: ["[gfx-noted]"]
     }
   },
   "Core|Graphics|defer": {
     "Whiteboard": {
-        whiteboard: ["[gfx-noted]"]
+      whiteboard: ["[gfx-noted]"]
     }
   },
   "Core|Graphics|backlog": {
-    "Whiteboardg": {
-        whiteboard: ["[gfx-noted]"]
+    "Whiteboard": {
+      whiteboard: ["[gfx-noted]"]
     }
   },
 };

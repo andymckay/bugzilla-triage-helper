@@ -20,9 +20,9 @@ function roundFirefoxVersion(version) {
 let eventFunctions = {
   blocking: function(bug) {
     log("adding blocking bug");
-    let value = document.getElementById('blocked').value;
+    let value = document.getElementById("blocked").value;
     if (!value.includes(bug)) {
-      document.getElementById('blocked').value = `${value} ${bug}`;
+      document.getElementById("blocked").value = `${value} ${bug}`;
     }
   },
   cc: function(action) {
@@ -102,10 +102,10 @@ let eventFunctions = {
     document.getElementById("changeform").submit();
   },
   whiteboard: function(text) {
-    log('adding to the whiteboard');
-    let value = document.getElementById('status_whiteboard').value;
+    log("adding to the whiteboard");
+    let value = document.getElementById("status_whiteboard").value;
     if (!value.includes(text)) {
-      document.getElementById('status_whiteboard').value = `${value} ${text}`;
+      document.getElementById("status_whiteboard").value = `${value} ${text}`;
     }
   }
 };
@@ -179,8 +179,8 @@ function hideAdditional(event) {
   }
 }
 
-function getAdditionalKey(action) {
-  return `${product}|${component}|${action.id}`;
+function getAdditionalKey(id) {
+  return `${product}|${component}|${id}`;
 }
 
 function actionEventString(events) {
@@ -200,7 +200,7 @@ function actionEventString(events) {
   return eventString;
 }
 
-function createAdditional(container, action, additional, additionalKey) {
+function createAdditional(container, action, additional) {
   for (let key of Object.keys(additional)) {
     let addElement = document.createElement("div");
     addElement.className = "additional";
@@ -209,7 +209,6 @@ function createAdditional(container, action, additional, additionalKey) {
     let a = document.createElement("a");
     a.innerText = key;
     a.dataset.additional = key;
-    a.dataset.additionalKey = additionalKey;
     a.dataset.parent = action.id;
     a.title = actionEventString(additional[key]);
     a.href = "#"; 
@@ -227,18 +226,17 @@ function processEvent(event) {
   for (let action of actions) {
     if (action.id === actionEvent) {
       log(`Found action for button: ${actionEvent}`);
-      processAction(action.events);
+      processAction(action.events); 
+      if (userConfig.submit) {
+        eventFunctions.submit();
+      }
       break;
     }
   }
   event.preventDefault();
 }
 
-function processAdditional(event) {
-  let actionEvent = event.target.dataset.parent;
-  let additionalAction = event.target.dataset.additional;
-  let additionalKey = event.target.dataset.additionalKey;
-
+function _processAdditional(actionEvent, additionalAction, additionalKey) {
   for (let action of actions) {
     if (action.id === actionEvent) {
       log(`Found action for button: ${actionEvent}`);
@@ -251,8 +249,25 @@ function processAdditional(event) {
       break;
     }
   }
+
   hideAdditional(event);
   event.preventDefault();
+}
+
+function processAdditional(event) {
+  let actionEvent = event.target.dataset.parent;
+  let additionalKey = getAdditionalKey(actionEvent);
+  let additionalAction = event.target.dataset.additional;
+
+  _processAdditional(actionEvent, additionalAction, additionalKey);
+}
+
+function processEventAndAdditional(event) {
+  let actionEvent = event.target.dataset.action;
+  let additionalKey = getAdditionalKey(actionEvent);
+  let additionalAction = Object.keys(additionalEvents[additionalKey])[0]; // eslint-disable-line no-undef
+
+  _processAdditional(actionEvent, additionalAction, additionalKey);
 }
 
 function createOverlay() {
@@ -265,12 +280,12 @@ function createOverlay() {
   container.appendChild(img);
 
   for (let action of actions) {
-    let additionalKey = getAdditionalKey(action);
+    let additionalKey = getAdditionalKey(action.id);
     let additional = additionalEvents[additionalKey];  // eslint-disable-line no-undef
 
     // Don't show a button if there's no events and no additional events.
     if (!action.events && !additional) {
-      log(`Skipping action: ${action.id} no events to process.`);
+      log(`Skipping action: ${action.id} no events to process`);
       continue;
     }
     
@@ -290,10 +305,15 @@ function createOverlay() {
     div.appendChild(a);
     div.appendChild(kbd);
     container.appendChild(div);
- 
+    
     if (additional) {
-      createAdditional(container, action, additional, additionalKey);
-      a.addEventListener("click", showAdditional);
+      if (Object.keys(additional).length > 1) {
+        createAdditional(container, action, additional);
+        a.addEventListener("click", showAdditional);
+      } else {
+        // If there's only one event, we'll select it by default;
+        a.addEventListener("click", processEventAndAdditional);
+      }
     } else {
       a.addEventListener("click", processEvent);
     }
