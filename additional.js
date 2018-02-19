@@ -14,7 +14,7 @@ let syncCanned = {
   "about:sync": {
     comment: ["Thanks for the report. To help us determine the cause of this issue, could you please install the about-sync addon from https://addons.mozilla.org/en-US/firefox/addon/about-sync/. This addon will let you view all of the data stored on the Sync servers. Again, thanks for the report and thanks for your help in finding the root cause of this problem."],
   },
-  "new": {
+  "New": {
     comment: ["Thanks for your interest in helping make Firefox great! The first step is to follow the guide at https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Introduction to learn how to build Firefox. Once you have done this you will have all of the files needed in a local checkout and it will be some of these files that will need to be changed. Please let us know in thus bug when you have got a Firefox build running locally and we'll give you some additional pointers for how to solve this bug."],
   }
 };
