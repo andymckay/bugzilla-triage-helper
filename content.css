@@ -67,17 +67,22 @@
     padding-right: .2rem;
 }
 
-#bugzilla-triage-helper .canned {
-    background: green;
-    border-radius: .2rem;
-    padding: .3rem;
-    margin-left: 4em;
+#bugzilla-triage-helper div.additional {
+    background: #212529;
+    margin-left: 2em;
     margin-bottom: .4rem;
+    border-radius: .2rem;
 }
 
-#bugzilla-triage-helper .canned a {
+#bugzilla-triage-helper div.additional a {
     color: white;
-    width: 5.17rem;
+    width: 6.7rem;
     display: inline-block;
     text-decoration: none;
+    padding: .3rem;
+}
+
+#bugzilla-triage-helper div.additional a:hover {
+    background-color: firebrick;
+    border-radius: .2rem;
 }

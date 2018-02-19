@@ -5,6 +5,8 @@ let urlObj = new URL(window.location);
 let params = new URLSearchParams(urlObj.search);
 let bugNumber = params.get("id");
 let versions = null;
+let product = null;
+let component = null;
 let newSkin = document.body.classList.contains("bug_modal");
 
 function log(msg) {
@@ -94,7 +96,7 @@ let eventFunctions = {
   }
 };
 
-function processAction(action, config) {
+function processAction(action) {
   // All the jiggles to get around the modal skin.
   if (newSkin) {
     let mode = document.getElementById("mode-btn");
@@ -117,18 +119,14 @@ function processAction(action, config) {
     }
   }
 
-  function process(action) {
-    for (let key of Object.keys(action.events)) {
-      let args = action.events[key];
+  function process(events) {
+    for (let key of Object.keys(events)) {
+      let args = events[key];
       if (key === "flag") {
         // TODO: would like to move this logic down into flags.
-        for (let eachArgs of action.events[key]) {
+        for (let eachArgs of events[key]) {
           eventFunctions[key].apply(null, eachArgs);
         }
-      } else if (key === "comment" && config.canned) {
-        // Insted of the args defined in the config, pass through the canned response.
-        let cannedText = canned[userConfig.canned][config.canned]; // eslint-disable-line no-undef
-        eventFunctions[key].apply(null, [cannedText]);
       } else {
         eventFunctions[key].apply(null, args);
       }
@@ -136,10 +134,111 @@ function processAction(action, config) {
     if (userConfig.cc !== "default") {
       eventFunctions.cc(userConfig.cc);
     }
-    if (userConfig.submit) {
-      eventFunctions.submit();
+  }
+}
+
+function showAdditional(event) {
+  hideAdditional(event);
+  let start = event.target.parentNode;
+  let startActionId = event.target.dataset.action;
+
+  function getNext(node) {
+    let element = node.nextSibling;
+    if (element.firstChild.dataset.parent === startActionId) {
+      element.style.display = "";
+      getNext(element);
     }
   }
+
+  getNext(start);
+  if (event) {
+    event.preventDefault();
+  }
+}
+
+function hideAdditional(event) {
+  for (let element of document.getElementsByClassName("additional")) {
+    element.style.display = "none";
+  }
+  if (event) {
+    event.preventDefault();
+  }
+}
+
+function getAdditionalKey(action) {
+  return `${product}|${component}|${action.id}`;
+}
+
+function actionEventString(events) {
+  let eventString = "";
+  if (events) {
+    for (let key of Object.keys(events)) {
+      let msg = events[key];
+      if (msg) {
+        msg = msg.join(", ");
+        msg = msg.length > 28 ? msg.slice(0, 28) + "..." : msg;
+        eventString += ` ${key} → ${msg}\n`;
+      }
+    }
+  } else {
+    eventString += "No actions.";
+  }
+  return eventString;
+}
+
+function createAdditional(container, action, additional, additionalKey) {
+  for (let key of Object.keys(additional)) {
+    let addElement = document.createElement("div");
+    addElement.className = "additional";
+    addElement.style.display = "none";
+
+    let a = document.createElement("a");
+    a.innerText = key;
+    a.dataset.additional = key;
+    a.dataset.additionalKey = additionalKey;
+    a.dataset.parent = action.id;
+    a.title = actionEventString(additional[key]);
+    a.href = "#"; 
+
+    a.addEventListener("click", processAdditional);
+    
+    addElement.appendChild(a);
+    container.appendChild(addElement);
+  }
+}
+
+function processEvent(event) {
+  let actionEvent = event.target.dataset.action;
+
+  for (let action of actions) {
+    if (action.id === actionEvent) {
+      log(`Found action for button: ${actionEvent}`);
+      processAction(action.events);
+      break;
+    }
+  }
+  event.preventDefault();
+}
+
+function processAdditional(event) {
+  let actionEvent = event.target.dataset.parent;
+  let additionalAction = event.target.dataset.additional;
+  let additionalKey = event.target.dataset.additionalKey;
+
+  for (let action of actions) {
+    if (action.id === actionEvent) {
+      log(`Found action for button: ${actionEvent}`);
+      processAction(action.events);
+      log(`Found action for additional event: ${additionalAction}`);
+      processAction(additionalEvents[additionalKey][additionalAction]); // eslint-disable-line no-undef
+      if (userConfig.submit) {
+        eventFunctions.submit();
+      }
+      break;
+    }
+  }
+  hideAdditional(event);
+  event.preventDefault();
 }
 
 function createOverlay() {
@@ -151,98 +250,25 @@ function createOverlay() {
   img.title = "Bugzilla Triage Helper";
   container.appendChild(img);
 
-  function processEvent(event) {
-    let actionEvent = event.target.dataset.action;
-
-    for (let action of actions) {
-      if (action.id === actionEvent) {
-        log(`Found action for button: ${actionEvent}`);
-        processAction(action, {});
-        break;
-      }
-    }
-    event.preventDefault();
-  }
-
-  function actionEventString(action) {
-    let eventString = '';
-    for (let key of Object.keys(action.events)) {
-      let msg = action.events[key];
-      if (msg) {
-        msg = msg.join(', ')
-        msg = msg.length > 28 ? msg.slice(0, 28) + "..." : msg;
-        eventString += ` ${key} → ${msg}\n`;
-      }
-    }
-    return eventString;
-  }
-
-  function processCanned(event) {
-    let actionEvent = event.target.dataset.parent;
-    let cannedMessage = event.target.dataset.canned;
-
-    for (let action of actions) {
-      if (action.id === actionEvent) {
-        log(`Found action for canned event: ${actionEvent}, message ${cannedMessage}`);
-        processAction(action, {canned: cannedMessage});
-        break;
-      }
-    }
-    hideCanned(event);
-    event.preventDefault();
-  }
-
-  function showCanned(event) {
-    for (let element of document.getElementsByClassName("canned")) {
-      element.style.display = "";
-    }
-    if (event) {
-      event.preventDefault();
-    }
-  }
-
-  function hideCanned(event) {
-    for (let element of document.getElementsByClassName("canned")) {
-      element.style.display = "none";
-    }
-    if (event) {
-      event.preventDefault();
-    }
-  }
-
-  function createCanned(container, action) {
-    for (let key of Object.keys(canned[userConfig.canned])) { // eslint-disable-line no-undef
-      let canned = document.createElement("div");
-      canned.className = "canned";
-      canned.style.display = "none";
-  
-      let a = document.createElement("a");
-      a.innerText = key;
-      a.dataset.canned = key;
-      a.dataset.parent = action.id;
-      a.href = "#"; 
-
-      a.addEventListener("click", processCanned);
-      
-      canned.appendChild(a);
-      container.appendChild(canned);
-    }
-  }
-
   for (let action of actions) {
-    if (action.list === "canned" && !userConfig.canned) {
+    let additionalKey = getAdditionalKey(action);
+    let additional = additionalEvents[additionalKey];  // eslint-disable-line no-undef
+
+    // Don't show a button if there's no events and no additional events.
+    if (!action.events && !additional) {
+      log(`Skipping action: ${action.id} no events to process.`);
       continue;
     }
     
     let div = document.createElement("div");
     div.className = "action";
     let a = document.createElement("a");
+    a.id = `bugzilla-triage-helper-${action.id}`;
     a.innerText = action.text;
     a.className = `action-${action.id}`;
     a.dataset.action = action.id;
-    a.title = actionEventString(action);
+    a.title = actionEventString(action.events);
     a.href = "#";
-
     
     let kbd = document.createElement("span");
     kbd.innerText = `Ctrl+${action.keyboard}`;
@@ -250,10 +276,10 @@ function createOverlay() {
     div.appendChild(a);
     div.appendChild(kbd);
     container.appendChild(div);
-
-    if (action.list === "canned") {
-      createCanned(container, action);
-      a.addEventListener("click", showCanned);
+ 
+    if (additional) {
+      createAdditional(container, action, additional, additionalKey);
+      a.addEventListener("click", showAdditional);
     } else {
       a.addEventListener("click", processEvent);
     }
@@ -293,15 +319,26 @@ document.addEventListener("keypress", (event) => {
     for (let action of actions) {
       if (action.keyboard === event.key) {
         log(`Found action for Ctrl+${event.key}: ${action.id}`);
-        processAction(action);
+        document.getElementById(`bugzilla-triage-helper-${action.id}`).dispatchEvent(clickEvent);
         break;
       }
     }
   }
+  event.preventDefault();
 }, false);
 
 function isLoggedIn() {
   return document.getElementById("login_link_top") === null;
+}
+
+function getProductComponent() {
+  if (newSkin) {
+    product = document.getElementById("product-name").textContent.trim();
+    component = document.getElementById("component-name").textContent.trim();
+  } else {
+    product = document.getElementById("product").value;
+    component = document.getElementById("component").value;
+  }
 }
 
 browser.runtime.sendMessage({action: "getVersions"})
@@ -317,11 +354,12 @@ browser.runtime.sendMessage({action: "getVersions"})
     }
   });
 
-
 if (isLoggedIn()) {
+  log("Logged in, creating overlay");
   browser.runtime.sendMessage({action: "getConfig"})
     .then((response) => {
       userConfig = response;
+      getProductComponent();
       createOverlay();
     });
 }
