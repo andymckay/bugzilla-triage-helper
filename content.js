@@ -18,6 +18,13 @@ function roundFirefoxVersion(version) {
 }
 
 let eventFunctions = {
+  blocking: function(bug) {
+    log("adding blocking bug");
+    let value = document.getElementById('blocked').value;
+    if (!value.includes(bug)) {
+      document.getElementById('blocked').value = `${value} ${bug}`;
+    }
+  },
   cc: function(action) {
     let bool = action === "no" ? false : true;
     if (newSkin) {
@@ -93,6 +100,13 @@ let eventFunctions = {
   submit: function() {
     log("Auto-submitting changes");
     document.getElementById("changeform").submit();
+  },
+  whiteboard: function(text) {
+    log('adding to the whiteboard');
+    let value = document.getElementById('status_whiteboard').value;
+    if (!value.includes(text)) {
+      document.getElementById('status_whiteboard').value = `${value} ${text}`;
+    }
   }
 };
 
