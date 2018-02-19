@@ -42,7 +42,7 @@ async function setupPage() {
     for (let eventKey of Object.keys(action.events)) {
       let eventElement = document.createElement("div");
       let args = action.events[eventKey].join(", ");
-      eventElement.innerText = `${eventKey} > ${args}`;
+      eventElement.innerText = `${eventKey} → ${args}`;
       actionsElement.appendChild(eventElement);
     }
 

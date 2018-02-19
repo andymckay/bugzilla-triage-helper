@@ -164,6 +164,19 @@ function createOverlay() {
     event.preventDefault();
   }
 
+  function actionEventString(action) {
+    let eventString = '';
+    for (let key of Object.keys(action.events)) {
+      let msg = action.events[key];
+      if (msg) {
+        msg = msg.join(', ')
+        msg = msg.length > 28 ? msg.slice(0, 28) + "..." : msg;
+        eventString += ` ${key} → ${msg}\n`;
+      }
+    }
+    return eventString;
+  }
+
   function processCanned(event) {
     let actionEvent = event.target.dataset.parent;
     let cannedMessage = event.target.dataset.canned;
@@ -227,6 +240,7 @@ function createOverlay() {
     a.innerText = action.text;
     a.className = `action-${action.id}`;
     a.dataset.action = action.id;
+    a.title = actionEventString(action);
     a.href = "#";
 
     
@@ -302,6 +316,7 @@ browser.runtime.sendMessage({action: "getVersions"})
       versions.LATEST_FIREFOX_VERSION = "38.0.1";
     }
   });
+
 
 if (isLoggedIn()) {
   browser.runtime.sendMessage({action: "getConfig"})
