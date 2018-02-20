@@ -4,6 +4,7 @@
     "background": {
         "scripts": ["actions.js", "bg.js"]
     },
+    "description": "A tool to provide consistent triage tools across the Firefox organisation in Mozilla",
     "permissions": [
         "activeTab",
         "alarms",

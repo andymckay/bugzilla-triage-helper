@@ -81,7 +81,6 @@ let actions = [ // eslint-disable-line no-unused-vars
     text: "Canned",
     id: "canned",
     events: null,
-    list: "canned",
     keyboard: "9"
   }
 ];
