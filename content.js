@@ -358,7 +358,6 @@ document.addEventListener("keypress", (event) => {
       }
     }
   }
-  event.preventDefault();
 }, false);
 
 function isLoggedIn() {
