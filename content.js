@@ -365,12 +365,17 @@ function isLoggedIn() {
 }
 
 function getProductComponent() {
-  if (newSkin) {
-    product = document.getElementById("product-name").textContent.trim();
-    component = document.getElementById("component-name").textContent.trim();
-  } else {
-    product = document.getElementById("product").value;
-    component = document.getElementById("component").value;
+  try {
+   if (newSkin) {
+      product = document.getElementById("product-name").textContent.trim();
+      component = document.getElementById("component-name").textContent.trim();
+    } else {
+      product = document.getElementById("product").value;
+      component = document.getElementById("component").value;
+    }
+  } catch(error) {
+    log('Failed to lookup product and component.');
+    log(error);
   }
 }
 
