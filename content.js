@@ -370,7 +370,7 @@ function isLoggedIn() {
 
 function getProductComponent() {
   try {
-   if (newSkin) {
+    if (newSkin) {
       product = document.getElementById("product-name").textContent.trim();
       component = document.getElementById("component-name").textContent.trim();
     } else {
@@ -378,7 +378,7 @@ function getProductComponent() {
       component = document.getElementById("component").value;
     }
   } catch(error) {
-    log('Failed to lookup product and component.');
+    log("Failed to lookup product and component.");
     log(error);
   }
 }
