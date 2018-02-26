@@ -110,29 +110,7 @@ let eventFunctions = {
   }
 };
 
-function processAction(action) {
-  // All the jiggles to get around the modal skin.
-  if (newSkin) {
-    let mode = document.getElementById("mode-btn");
-    var observer = new MutationObserver(changed);
-
-    if (!mode.style.display) {
-      mode.dispatchEvent(clickEvent);
-      observer.observe(mode, {attributes: true, childList: true});
-    } else {
-      process(action);
-    }
-  } else {
-    process(action);
-  }
-
-  function changed(mutationList) {
-    if (mutationList[0].target.disabled) {
-      process(action);
-      observer.disconnect();
-    }
-  }
-
+function processEvents(events) {
   function process(events) {
     for (let key of Object.keys(events)) {
       let args = events[key];
@@ -147,6 +125,28 @@ function processAction(action) {
     }
     if (userConfig.cc !== "default") {
       eventFunctions.cc(userConfig.cc);
+    }
+  }
+
+  // All the jiggles to get around the modal skin.
+  if (newSkin) {
+    let mode = document.getElementById("mode-btn");
+    var observer = new MutationObserver(changed);
+
+    if (!mode.style.display) {
+      mode.dispatchEvent(clickEvent);
+      observer.observe(mode, {attributes: true, childList: true});
+    } else {
+      process(events);
+    }
+  } else {
+    process(events);
+  }
+
+  function changed(mutationList) {
+    if (mutationList[0].target.disabled) {
+      process(events);
+      observer.disconnect();
     }
   }
 }
@@ -220,13 +220,13 @@ function createAdditional(container, action, additional) {
   }
 }
 
-function processEvent(event) {
+function processAction(event) {
   let actionEvent = event.target.dataset.action;
 
   for (let action of actions) {
     if (action.id === actionEvent) {
       log(`Found action for button: ${actionEvent}`);
-      processAction(action.events); 
+      processEvents(action.events); 
       if (userConfig.submit) {
         eventFunctions.submit();
       }
@@ -239,10 +239,14 @@ function processEvent(event) {
 function _processAdditional(actionEvent, additionalAction, additionalKey) {
   for (let action of actions) {
     if (action.id === actionEvent) {
-      log(`Found action for button: ${actionEvent}`);
-      processAction(action.events);
+      if (action.events) {
+        log(`Found action for button: ${actionEvent}`);
+        processEvents(action.events);
+      } else {
+        log(`No action for button: ${actionEvent}, skipping`);
+      }
       log(`Found action for additional event: ${additionalAction}`);
-      processAction(additionalEvents[additionalKey][additionalAction]); // eslint-disable-line no-undef
+      processEvents(additionalEvents[additionalKey][additionalAction]); // eslint-disable-line no-undef
       if (userConfig.submit) {
         eventFunctions.submit();
       }
@@ -262,7 +266,7 @@ function processAdditional(event) {
   _processAdditional(actionEvent, additionalAction, additionalKey);
 }
 
-function processEventAndAdditional(event) {
+function processActionAndAdditional(event) {
   let actionEvent = event.target.dataset.action;
   let additionalKey = getAdditionalKey(actionEvent);
   let additionalAction = Object.keys(additionalEvents[additionalKey])[0]; // eslint-disable-line no-undef
@@ -312,10 +316,10 @@ function createOverlay() {
         a.addEventListener("click", showAdditional);
       } else {
         // If there's only one event, we'll select it by default;
-        a.addEventListener("click", processEventAndAdditional);
+        a.addEventListener("click", processActionAndAdditional);
       }
     } else {
-      a.addEventListener("click", processEvent);
+      a.addEventListener("click", processAction);
     }
   }
 
