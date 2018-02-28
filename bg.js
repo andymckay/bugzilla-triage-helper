@@ -7,17 +7,20 @@ let BUGZILLA_PARAMS = [
   "f1=triage_owner",
   "f3=keywords",
   "f4=bug_severity",
+  "f5=flagtypes.name",
   "include_fields=id", // only return ids since it's faster and we're just counting bugs
   "o1=equals",
   "o3=notequals",
   "o4=notequals",
+  "o5=notsubstring",
   "priority=--",
   "resolution=---",
   "short_desc=^\\%5Bmeta", // alternative standard for metabugs
   "short_desc_type=notregexp",
   // v1	is supplied from userinfo
   "v3=meta", // feature or tracking
-  "v4=enhancement", // feature
+  "v4=enhancement", // feature,
+  "v5=needinfo" // open needinfos
 ].join("&");
 let BUGZILLA_BROWSER_URL = "https://bugzilla.mozilla.org/buglist.cgi";
 let BUGZILLA_QUERY_URL = "https://bugzilla.mozilla.org/rest/bug";
