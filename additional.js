@@ -1,4 +1,7 @@
-let syncCanned = {        
+let syncCanned = {
+  "Reply": {
+    comment: ["Thanks again for reporting this issue, but we are unable to determine the cause of the problem without the requested information. If you are able to provide this information, please just add a comment in this bug with that information and we'll get back to you as soon as we can, but in the meantime we are closing this bug so we can focus on the issues which we can address."],
+  },        
   "Dupe": {
     comment: ["We're sorry to hear you are having this problem. We've seen a number of reports like this, but we are unable to determine exactly what causes it. In the meantime I'm closing this as a duplicate of the bug where we are tracking this work and please accept our apologies for the problems you are having."],
   },
