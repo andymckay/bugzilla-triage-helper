@@ -1,4 +1,6 @@
-This is work in progress, but might work for some people.
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
+**Unmaintained** I no longer use Bugzilla at all, if you'd like to take over this project please let me know. Until then its unmaintained and archived.
 
 The goal of Bugzilla Triage Helper is to provide an easy and standard interface to triaging bugs across the Firefox organization within Mozilla. This is in an early stage, we are giving it a try and looking for feedback.
 
